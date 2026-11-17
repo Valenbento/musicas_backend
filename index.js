@@ -24,11 +24,6 @@ app.get("/", (request, response) => {
     }
     response.json(data) })
 })
-
-app.listen(3000, () => {
-    console.log("Servidor rodando na porta 3000")
-})
-
 app.post("/cadastrar", (request, response) => {
     const { titulo, artista, genero, ano, duracao } = request.body
 
@@ -43,4 +38,22 @@ app.post("/cadastrar", (request, response) => {
         response.status(201).json({ mensagem: "Música cadastrada com sucesso!" })
     })
 })
+app.delete("/apagar/:id", (request, response) => {
+    const { id } = request.params
+
+    const comandoDelete = "DELETE FROM musicas_valentinabento WHERE id = ?"
+
+    sql.query(comandoDelete, [id], (error) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+
+        response.json({ mensagem: "Música apagada com sucesso!" })
+    })
+})
+app.listen(3000, () => {
+    console.log("Servidor rodando na porta 3000")
+})
+
 export default app
