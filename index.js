@@ -1,3 +1,4 @@
+
 import express from "express"
 import cors from "cors"
 import mysql2 from "mysql2"
@@ -15,15 +16,21 @@ const sql = mysql2.createPool({
     database: process.env.NOME_BANCO
 })
 
-app.get("/", (request, response) => { 
-    const comandoSelect =  "SELECT * FROM musicas_valentinabento"
-    sql.query(comandoSelect, (error, data) => {  
-        if (error){
-        console.log(error)
-        return
-    }
-    response.json(data) })
+
+app.get("/", (request, response) => {
+    const comandoSelect = "SELECT * FROM musicas_valentinabento"
+
+    sql.query(comandoSelect, (error, data) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+
+        response.json(data)
+    })
 })
+
+
 app.post("/cadastrar", (request, response) => {
     const { titulo, artista, genero, ano, duracao } = request.body
 
@@ -38,6 +45,8 @@ app.post("/cadastrar", (request, response) => {
         response.status(201).json({ mensagem: "Música cadastrada com sucesso!" })
     })
 })
+
+
 app.delete("/apagar/:id", (request, response) => {
     const { id } = request.params
 
@@ -52,6 +61,40 @@ app.delete("/apagar/:id", (request, response) => {
         response.json({ mensagem: "Música apagada com sucesso!" })
     })
 })
+
+
+app.get("/musica/:id", (request, response) => {
+    const { id } = request.params
+
+    const comandoSelect = "SELECT * FROM musicas_valentinabento WHERE id = ?"
+
+    sql.query(comandoSelect, [id], (error, data) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+
+        response.json(data[0])
+    })
+})
+
+app.put("/editar/:id", (request, response) => {
+    const { id } = request.params
+    const { titulo, artista, genero, ano, duracao } = request.body
+
+    const comandoUpdate = "UPDATE musicas_valentinabento SET titulo = ?, artista = ?, genero = ?, ano = ?, duracao = ? WHERE id = ?"
+
+    sql.query(comandoUpdate, [titulo, artista, genero, ano, duracao, id], (error) => {
+        if (error) {
+            console.log(error)
+            return
+        }
+
+        response.json({ mensagem: "Música alterada com sucesso!" })
+    })
+})
+
+
 app.listen(3000, () => {
     console.log("Servidor rodando na porta 3000")
 })
